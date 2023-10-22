@@ -15,16 +15,31 @@ import App from "./App";
 
 const check = setInterval(() => {
 
-    if ( document.querySelector('.product-page__aside')) {
-
-
-        document.querySelector('.product-page__aside')
+    if ( document.querySelector('.product-page__aside-container')) {
 
 
 
 
-        const container = document.querySelector('.price-history__btn');
-        const root = createRoot(container!);
+
+        const newElement = document.createElement('div');
+
+
+
+        const parentElement =   document.querySelector('.product-page__aside-container')
+
+// Check if there's an existing second child element
+        const existingSecondChild = parentElement?.children[1];
+
+// Insert the new element as the second child
+        if (existingSecondChild) {
+            parentElement.insertBefore(newElement, existingSecondChild);
+        } else {
+            parentElement.appendChild(newElement);
+        }
+
+
+        // const container = document.querySelector('.price-history__btn');
+        const root = createRoot(newElement!);
 
         root.render(
             <React.StrictMode>
@@ -42,20 +57,39 @@ const check = setInterval(() => {
 
 const checkSecond = setInterval(() => {
 
-    if ( document.querySelector('.details-section__header-wrap')) {
+    if ( document.querySelector('.product-page__price-block--common')) {
 
 
 
 
 
-        console.log('2check')
+        const newElement = document.createElement('div');
 
-        const container = document.querySelector('.details-section__header-wrap');
-        const root = createRoot(container!);
+
+
+        const parentElement =   document.querySelector('.product-page__price-block--common')
+
+// Check if there's an existing second child element
+        const existingSecondChild = parentElement?.children[1];
+
+// Insert the new element as the second child
+        if (existingSecondChild) {
+            parentElement.insertBefore(newElement, existingSecondChild);
+        } else {
+            parentElement.appendChild(newElement);
+        }
+
+
+        // const container = document.querySelector('.price-history__btn');
+        const root = createRoot(newElement!);
+
+
+
+
 
         root.render(
             <React.StrictMode>
-                <WarehouseComponent/>
+                <CLDComponent/>
             </React.StrictMode>
         );
 
