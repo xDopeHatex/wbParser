@@ -58,3 +58,7 @@ code {
     transform: rotate(360deg);
   }
 }
+
+.box-shadow {
+  box-shadow: 0 0 20px rgba(0,0,0,.1)
+}

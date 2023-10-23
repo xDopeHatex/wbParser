@@ -1,5 +1,5 @@
 
-// @ts-ignore
+
 import React from "react";
 import CLDComponent from "./components/CLDComponent";
 import WarehouseComponent from "./components/WarehouseComponent";
@@ -8,99 +8,125 @@ import {useState} from "react";
 import '../../src/main.css'
 import App from "./App";
 
+type objType = {
+    parentDivClass: string,
+    component: JSX.Element | undefined,
+    type: 'asSecondChild' | 'inFirstChild'
+}
+
+type injectArrayType = objType[]
 
 
 
 
+const injectArray: injectArrayType =
+    [
+        {parentDivClass: '.product-page__aside-container', component:  <CLDComponent/>, type: 'asSecondChild'},
+        {parentDivClass: '.product-page__price-block--common', component:  <CLDComponent/>, type: 'inFirstChild'},
+        {parentDivClass: '.product-page__aside-sticky', component:  <WarehouseComponent/>, type: 'asSecondChild'},
 
-const check = setInterval(() => {
-
-    if ( document.querySelector('.product-page__aside-container')) {
-
-
-
-
-
-        const newElement = document.createElement('div');
+    ]
 
 
 
-        const parentElement =   document.querySelector('.product-page__aside-container')
+const injectComponent = (obj: objType) => {
+    console.log('inject')
+    const {parentDivClass, component, type} = obj
+     const check = setInterval(() => {
+         const parentElement =   document.querySelector(parentDivClass)
+        if ( parentElement) {
+            const newElement = document.createElement('div');
 
-// Check if there's an existing second child element
-        const existingSecondChild = parentElement?.children[1];
 
-// Insert the new element as the second child
-        if (existingSecondChild) {
-            parentElement.insertBefore(newElement, existingSecondChild);
-        } else {
-            parentElement.appendChild(newElement);
+            if (type === 'asSecondChild') {
+
+            // Check if there's an existing second child element
+            const existingSecondChild = parentElement?.children[1];
+
+            // Insert the new element as the second child
+            if (existingSecondChild) {
+                parentElement.insertBefore(newElement, existingSecondChild);
+            } else {
+                parentElement?.appendChild(newElement);
+            }
+            }
+
+            if (type === 'inFirstChild') {
+                const placeForInjection = parentElement.querySelector('div')
+                placeForInjection?.appendChild(newElement)
+
+            }
+
+            // const container = document.querySelector('.price-history__btn');
+            const root = createRoot(newElement!);
+
+            root.render(component);
+
+            clearInterval(check)
+
         }
 
+    }, 50)
 
-        // const container = document.querySelector('.price-history__btn');
-        const root = createRoot(newElement!);
-
-        root.render(
-            <React.StrictMode>
-                <CLDComponent  />
-            </React.StrictMode>
-        );
+    return check
+}
 
 
-        clearInterval(check)
 
-
-    }
-
-}, 100)
-
-const checkSecond = setInterval(() => {
-
-    if ( document.querySelector('.product-page__price-block--common')) {
+injectArray.forEach((item) => injectComponent(item))
 
 
 
 
-
-        const newElement = document.createElement('div');
-
-
-
-        const parentElement =   document.querySelector('.product-page__price-block--common')
-
-// Check if there's an existing second child element
-        const existingSecondChild = parentElement?.children[1];
-
-// Insert the new element as the second child
-        if (existingSecondChild) {
-            parentElement.insertBefore(newElement, existingSecondChild);
-        } else {
-            parentElement.appendChild(newElement);
-        }
-
-
-        // const container = document.querySelector('.price-history__btn');
-        const root = createRoot(newElement!);
-
-
-
-
-
-        root.render(
-            <React.StrictMode>
-                <CLDComponent/>
-            </React.StrictMode>
-        );
-
-
-        clearInterval(checkSecond)
-
-
-    }
-
-}, 100)
-
+//
+// const checkSecond = setInterval(() => {
+//     console.log('OldTimes')
+//
+//     if ( document.querySelector('.product-page__price-block--common')) {
+//
+//
+//
+//
+//
+//         const newElement = document.createElement('div');
+//
+//
+//
+//         const parentElement =   document.querySelector('.product-page__price-block--common')
+//
+// // Check if there's an existing second child element
+//         const existingSecondChild = parentElement?.children[1];
+//
+// // Insert the new element as the second child
+//         if (existingSecondChild) {
+//             parentElement.insertBefore(newElement, existingSecondChild);
+//         } else {
+//             parentElement?.appendChild(newElement);
+//         }
+//
+//
+//         // const container = document.querySelector('.price-history__btn');
+//         const root = createRoot(newElement!);
+//
+//
+//
+//
+//
+//
+//         root.render(
+//             // @ts-ignore
+//                 <CLDComponent/>
+//
+//         );
+//
+//
+//         clearInterval(checkSecond)
+//
+//
+//     }
+//
+// }, 50)
+//
 
 
 // const body = document.querySelector("body");

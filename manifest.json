@@ -9,7 +9,7 @@
   },
   "icons": {},
 
-  "permissions": ["storage", "tabs", "activeTab", "scripting", "declarativeNetRequest", "activeTab", "webRequest"],
+  "permissions": ["storage", "tabs", "activeTab", "scripting", "declarativeNetRequest", "activeTab", "webRequest", "webNavigation"],
   "host_permissions": ["https://*/"],
   "background": {
     "service_worker": "background/src/main.tsx"
