@@ -12,7 +12,8 @@
   "permissions": ["storage", "tabs", "activeTab", "scripting", "declarativeNetRequest", "activeTab", "webRequest", "webNavigation"],
   "host_permissions": ["https://*/"],
   "background": {
-    "service_worker": "background/src/main.tsx"
+    "service_worker": "background/src/main.tsx",
+    "type": "module"
 
   },
 
