@@ -23,8 +23,7 @@ const injectArray: injectArrayType =
     [
         {parentDivClass: '.product-page__aside-container', component:  <CLDComponent/>, type: 'asSecondChild'},
         {parentDivClass: '.product-page__price-block--common', component:  <CLDComponent/>, type: 'inFirstChild'},
-
-
+        {parentDivClass: '.product-page .product-page__aside-sticky', component:  <WarehouseComponent/>, type: 'asSecondChild'},
     ]
 
 

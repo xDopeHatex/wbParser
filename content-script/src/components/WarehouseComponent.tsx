@@ -5,127 +5,47 @@ import {useEffect} from "react";
 import axios from "axios";
 
 
-import {TagIcon, BoltIcon} from "@heroicons/react/24/solid";
+import {BoltIcon} from "@heroicons/react/24/solid";
 
 
-
-import '../../../src/main.css'
-
-const regexTabUrl = /\/(\d+)\/detail.aspx/;
-type dataType = { basicPriceU: number,
-    basicSale: number,
-    clientPriceU: number,
-    clientSale: number }
+type dataType = any
 
 
-
-
-let data: dataType
+let fetchDataStock: dataType
+let fetchDataWHNames: dataType
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    // if (message.type === "WAREHOUSE_STOCK_PAYLOAD") {
+    //     fetchDataStock = message.data.payload
+    //     console.log('fetchData', fetchDataStock)
+    // }
 
-    let dataUrl: string | null = null
-    let currentId: number | null = null
-    let warehouseDataUrl: string | null = null
-
-    if (dataUrl === null || warehouseDataUrl === null ) {
-
-        if (message.type === "URL") {
-            currentId = parseInt(message.data.tabUrl.match(regexTabUrl)[1], 10)
-            dataUrl = message.data.url
-
-        }
-
-        const fetch = async () => {
-            try {
-
-                const res = await axios.get(dataUrl!)
-                data = res.data.data.products.find((item: any) => item.id === currentId)?.extended
-
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetch()
+    if (message.type === "WAREHOUSE_NAME_PAYLOAD") {
+        fetchDataWHNames = message.data.payload
+        console.log('fetchDataWH', fetchDataWHNames)
     }
+
 });
 
 
-function WarehouseComponent () {
+function WarehouseComponent() {
 
-
-
-
-    const [fetchedData, setFetchedData] = useState<dataType>(data)
-    const [dataUrlFetch, setDataUrlFetch] = useState<string>("");
-    const [productId, setProductId] = useState<number | null>(null)
-    const [loading, setLoading] = useState<boolean>(false)
-
-
-
-
-
-
-
+    const [data, setData] = useState<dataType>(fetchDataStock)
     useEffect(() => {
         // Listen for every update of URL from BG and update urlForDataFetch and productId
-
         const messageListener = (message: any) => {
 
-            if (message.type === "URL") {
-
-                // set productId
-                const productIdRaw = message.data.tabUrl.match(regexTabUrl);
-
-                setProductId(parseInt(productIdRaw[1], 10))
-
-                if (dataUrlFetch !== message.data.url)
-                    // set Loading
-                    setLoading(true)
-                {
-
-                    setDataUrlFetch(message.data.url)
-                }
-
-
-
+            if (message.type === "WAREHOUSE_STOCK_PAYLOAD") {
+                setData(message.data.payload)
             }
         };
-
-
-
         chrome.runtime.onMessage.addListener(messageListener);
 
         return () => chrome.runtime.onMessage.removeListener(messageListener)
     }, []);
 
-    useEffect(() => {
-        if (dataUrlFetch !== '' && productId !== null) {
-
-            const fetch = async () => {
-                try {
-
-                    const res = await axios.get(dataUrlFetch)
-
-                    setFetchedData(res.data.data.products.find((item: any) => item.id === productId)?.extended)
-
-                    setLoading(false)
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            fetch()
-        }
 
 
-    }, [dataUrlFetch])
-
-
-
-
-
-
-
-    if (fetchedData && !loading) { return (
+  return (
 
 
         <div className='box-shadow text-sm rounded-xl bg-white p-[20px] flex flex-col gap-y-4  mb-[24px]'>
@@ -139,7 +59,7 @@ function WarehouseComponent () {
         </div>
 
 
-    ) } else {return (<></>)}
+    )
 }
 
 export default WarehouseComponent;
