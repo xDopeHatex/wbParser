@@ -46,7 +46,7 @@ if (data) {
                 <span className='text-xl font-black'>{data?.clientSale}%</span>
             </div>
             <div className='text-gray-500'>
-                <span className='text-sm ml-3 font-medium'>До СПП:</span>
+                <span className='text-sm ml-3 font-medium'>До СПП:&nbsp;</span>
                 {data.basicPriceU ? parseInt(data?.basicPriceU?.toString()?.slice(0, -2), 10) : null}&#8381;
             </div>
         </div>

@@ -19,7 +19,7 @@
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://www.wildberries.ru/*"],
       "js": ["content-script/src/main.tsx"],
       "media": []
     }

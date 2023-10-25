@@ -5,18 +5,20 @@ import './main.css'
 
 
 
+
+
 function App() {
 
 
-
   return (
-    <div className="App">
-      <header className="App-header">
+    <section className="App-header h-[200px] w-[300px] bg-neutral-800 flex items-center flex-col gap-y-10 p-[40px] justify-center">
 
-        <p className='text-3xl text-red-500'>Hello, World!</p>
-        <p>I'm a Chrome Extension Popup!</p>
-      </header>
-    </div>
+
+        <p className='text-3xl text-teal-600'>Hello World!</p>
+
+
+
+    </section>
   );
 }
 

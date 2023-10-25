@@ -149,3 +149,6 @@ chrome.webRequest.onBeforeRequest.addListener(
     handleBeforeRequest,
     { urls: ['https://card.wb.ru/cards/v1/detail?appType*', '*://*/*/stores-data.json*'] }
 );
+
+
+
