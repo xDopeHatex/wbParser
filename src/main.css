@@ -62,3 +62,26 @@ code {
 .box-shadow {
   box-shadow: 0 0 20px rgba(0,0,0,.1)
 }
+
+.disabled-button-bg {
+  background-color: #F6F6F9;
+  color: #D5D6DF;
+  border-color: #F6F6F9;
+}
+
+.disabled-text-color {
+  color: #D5D6DF;
+}
+
+.active-button-size {
+  background-color: #ccfbf1;
+  box-shadow: 0 0 20px rgba(0,0,0,.1);
+  border-color: #ccfbf1;
+}
+
+ @media (min-width: 1024px) {
+   .mediaQueriesLg {
+     box-shadow: 0 0 20px rgba(0, 0, 0, .1)
+   }
+
+}

@@ -11,44 +11,29 @@ type dataType = { basicPriceU: number,
     clientSale: number }
 
 
-// let fetchData: dataType
-// chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-//         if (message.type === "PRODUCTS_PAYLOAD") {
-//             fetchData = message.data.payload
-//         }
-// });
-
-
-
+let fetchData: dataType
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message.type === "COMBINED_PAYLOAD") {
+        fetchData = message.data.productsPayload.payload
+    }
+});
 
 
 function CLDComponent() {
 
-    const [data, setData] = useState<dataType>()
-
+    const [data, setData] = useState<dataType>(fetchData)
     useEffect(() => {
-        const listener = () => {
-            chrome.storage.local.get(["storageChange"], (result) => {
-                console.log(result, 'LISYENER')
-                setData(result.storageChange);
-            })
+        // Listen for every update of URL from BG and update urlForDataFetch and productId
+        const messageListener = (message: any) => {
+
+            if (message.type === "COMBINED_PAYLOAD") {
+                setData(message.data.productsPayload.payload)
+            }
         };
-        chrome.storage.onChanged.addListener(listener);
+        chrome.runtime.onMessage.addListener(messageListener);
 
-        chrome.storage.local.get(["storageChange"], (result) => {
-
-            setData(result.storageChange);
-            console.log(result.storageChange)
-        })
-
-        return () => {
-            chrome.storage.onChanged.removeListener(listener);
-        };
+        return () => chrome.runtime.onMessage.removeListener(messageListener)
     }, []);
-
-
-
-
 
 
     return (
@@ -59,7 +44,7 @@ function CLDComponent() {
                 {data?.clientSale}%</div>
             <div className='text-gray-500'>
                 <span className='text-sm ml-3'>До СПП:</span>
-                {data?.basicPriceU ?   parseInt(data.basicPriceU.toString().slice(0, -2), 10) : null}&#8381;
+                {data.basicPriceU ?   parseInt(data?.basicPriceU?.toString()?.slice(0, -2), 10) : null}&#8381;
             </div>
         </div>
 
@@ -68,11 +53,3 @@ function CLDComponent() {
 }
 
 export default CLDComponent;
-
-
-
-//
-
-//
-
-

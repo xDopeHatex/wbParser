@@ -9,79 +9,61 @@ type readyForFetchType = {
     fetchWarehouse : null | string
 }
 
-
+let prevUrlProducts: string
+let prevUrlWarehouse: string
+let currentUrlWarhouse: string
 
 let pageReloadedProducts: boolean = false
-
+let pageReloadedWarehouse: boolean = false
 let pageChangedUrlProducts: boolean = false
-let prevProdUrl: string  =''
-
-
+let pageChangedUrlWarehouse: boolean = false
 
 const readyForFetch: readyForFetchType = {
     fetchProducts : null,
     fetchWarehouse : null
 }
 
-const fetchedData: any = {}
+chrome.alarms.onAlarm.addListener(a => {
+    console.log('Alarm! Alarm!', a);
+});
 
-
-
-
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.alarms.get('alarm', a => {
+        if (!a) {
+            console.log('ALARM')
+            chrome.alarms.create('alarm', {periodInMinutes: 0.1});
+        }
+    });
+});
 
 
 
 
 chrome.webNavigation.onCommitted.addListener((details) => {
     if (details?.transitionType === "reload") {
-        pageReloadedProducts = true
 
+        pageReloadedProducts = true
+        pageReloadedWarehouse = true
     }
 });
 
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
-
     pageChangedUrlProducts = true
-
-
+    pageChangedUrlWarehouse = true
 });
 
-
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-    if (namespace === 'local' && changes.key) {
-
-        chrome.runtime.sendMessage({ action: 'storageChange', newValue: changes.key.newValue });
-    }
-});
+const fetchWarehouseNames: any = {}
 
 
 function handleBeforeRequest(details: any) {
 
 
 
-    chrome.tabs.query({active: true, currentWindow: true}, async function (tabs) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
 
-
-
-            console.log('2nd step url', details.url)
-            if (details.url.startsWith(urlProductsStartPattern) && readyForFetch.fetchProducts === null) {
-
-                readyForFetch.fetchProducts = details.url
-                console.log(readyForFetch.fetchProducts, 'what to fetch')
-            }
-
-
-            if (details.url.endsWith(urlWarehouseEndsWith) && readyForFetch.fetchWarehouse === null) {
-
-                readyForFetch.fetchWarehouse = details.url
-            }
-
-
-            if (readyForFetch.fetchWarehouse && readyForFetch.fetchProducts) {
+            if (details.url.startsWith(urlProductsStartPattern)) {
 
                 if (pageChangedUrlProducts || pageReloadedProducts) {
-
-                    console.log('guess you changed')
 
                     if (pageReloadedProducts) {
                         pageReloadedProducts = false
@@ -90,58 +72,83 @@ function handleBeforeRequest(details: any) {
                     if (pageChangedUrlProducts) {
                         pageChangedUrlProducts = false
                     }
-                    if (tabs[0].url !== prevProdUrl) {
-                        prevProdUrl = tabs[0].url!
+
 
                     const productIdRaw = tabs[0]?.url?.match(regexTabUrl)![1] as string;
                     const productId = parseInt(productIdRaw, 10);
 
 
 
-                        const fetchProd = async (url: string) => {
-                            try { const res = await fetch(url)
-                                const final = await res.json()
+                     const maxRetries = 10; // Define the maximum number of retry attempts
+                     let retryCount = 0;
 
-                                return final
-                            } catch (error) {console.log(error)}
+                    async function fetchData(url: any) {
+                        try {
+
+
+
+                            while (retryCount < maxRetries) {
+                                const responseWH = await fetch(currentUrlWarhouse);
+                                const responseWHJSON = await responseWH.json();
+                                const payloadWarehouse = responseWHJSON;
+                                fetchWarehouseNames.data = payloadWarehouse;
+
+
+
+                            const response = await fetch(url);
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                            const responseJSON = await response.json();
+
+                            const product = responseJSON.data.products.find((item: any) => item.id === productId);
+
+
+                            const warehousePayload = product
+                                console.log(warehousePayload, 'THATS GO FOR RAW FROM BG')
+
+                                chrome.tabs.sendMessage(tabs[0].id!, {
+                                    type: "COMBINED_PAYLOAD",
+                                    data: {
+                                        productsPayload: { payload: product.extended },
+                                        warehousePayload: { payload: warehousePayload, names: fetchWarehouseNames.data },
+                                    }
+                                });
+                            return response.ok
+                        }} catch (error) {
+                            console.error(`Fetch error: ${error}`);
+                            retryCount++;
+                            console.log(`Retrying (attempt ${retryCount})...`);
+                            await new Promise(resolve => setTimeout(resolve, 10)); // Retry after a delay (e.g., 1 second)
                         }
-
-                           const payloadProductsRaw = await fetchProd(readyForFetch.fetchProducts)
-                            console.log(payloadProductsRaw)
-                            const payloadProducts = await payloadProductsRaw.data.products.find((item: any) => item.id === productId)
-                            console.log( await payloadProducts, 'kkk')
-                            chrome.storage.local.set({storageChange: await payloadProducts.extended}).then(() => {
-                                console.log('SET NEW DATA BG', payloadProducts.extended)
-                            });
-
-
-
-
-
-                    if (fetchedData.warehouseNames === undefined) {
-                        fetch(readyForFetch.fetchWarehouse)
-                            .then(response => response.json())
-                            .then(responseJSON => {
-
-                                fetchedData.warehouseNames = responseJSON
-
-
-                            });
-
                     }
+
+                    fetchData(details.url);
+
+
+
 
                 }
             }
 
+        if (details.url.endsWith(urlWarehouseEndsWith)) {
+            if ( details.url !== prevUrlProducts ) {
+                currentUrlWarhouse = details.url
+
+            }
+
+
 
         }
 
+
+
+
         }
 
 
-    )
 
-}
+    )}
 
 
 
@@ -153,8 +160,3 @@ chrome.webRequest.onBeforeRequest.addListener(
     handleBeforeRequest,
     { urls: ['https://card.wb.ru/cards/v1/detail?appType*', '*://*/*/stores-data.json*'] }
 );
-
-
-
-
-
