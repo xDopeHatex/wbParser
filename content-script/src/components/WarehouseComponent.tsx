@@ -164,13 +164,13 @@ function WarehouseComponent() {
 
 
         <div className='mediaQueriesLg text-sm rounded-xl bg-white lg:p-[20px] flex flex-col gap-y-4  mb-[24px] mt-[24px] '>
-            <div className='text-neutral-700 text-xl'>Раскладка по складам</div>
+            <div className='text-neutral-700 text-xl font-semibold'>Раскладка по складам</div>
             <div className='flex items-center gap-3  flex-wrap'>
                 <button onClick={allSizesHandler}  className={`rounded-lg button-border-style py-[3px] px-[12px] flex flex-col  ${ sizeActive == 1036 ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span>все</span><span className="text-neutral-400">размеры</span></button>
                 {rawData.map((size: any) =>  <button key={size.name} onClick={() => activeSizeHandler(size.stocks.length, size.name)}  className={`rounded-lg  py-[3px] px-[12px] flex flex-col  ${size.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeActive == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' button-border-style hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks.length === 0 ? "disabled-text-color" :  '' }`}>{size?.origName}</span><span className={`text-xs ${size?.stocks?.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size?.name}</span></button> )}</div>
-            {<div className='text-neutral-700 text-lg'>{fastestWarehouse?.whName}: <span>{fastestWarehouse?.time1 + fastestWarehouse?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
+            {<div className='text-neutral-700 text-lg font-medium'>{fastestWarehouse?.whName}: <span>{fastestWarehouse?.time1 + fastestWarehouse?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
             <div className='border-t-[1px] border-teal-200'></div>
-            {allWarehousesArr?.map((item:any) =>  <div key={item?.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div></div>)}
+            {allWarehousesArr?.map((item:any) =>  <div key={item.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span className='font-medium'>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div></div>)}
         </div>
 
 

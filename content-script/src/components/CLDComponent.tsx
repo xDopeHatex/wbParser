@@ -38,7 +38,7 @@ function CLDComponent() {
 if (data) {
     return (
         <div
-            className='mb-4 text-sm rounded-lg bg-[#F6F6F9] px-4 py-4 text-base text-xl text-neutral-900 flex gap-x-3 items-center'>
+            className='mb-4 text-sm rounded-lg bg-[#F6F6F9] px-4 py-4 text-base text-xl text-neutral-900 flex gap-x-3 items-center min-w-[300px]'>
             <div className='w-6 h-6 flex justify-center items-center text-teal-200'><RocketLaunchIcon/></div>
             <div>
                 <span className='text-sm text-gray-500 font-medium'>СПП</span>
