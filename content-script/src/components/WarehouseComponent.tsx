@@ -5,13 +5,15 @@ import {useEffect} from "react";
 import axios from "axios";
 
 
-import {BoltIcon} from "@heroicons/react/24/solid";
+import {BoltIcon, EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
 
 
 type dataType = any
 
 let fetchedRawPayload: any
 let fetchFinalData: any
+let allInStock: boolean
+let noSize: boolean
 
 
 
@@ -51,6 +53,12 @@ function handleMessage(message: any) {
             }
         }
 
+        allInStock = !fetchRaw.find((size:any) => size.stocks.length === 0)
+        console.log(allInStock, 'sdsd')
+        noSize = !!fetchRaw.find((size:any) => size.name === '')
+
+        console.log(noSize,'siz')
+
         fetchedRawPayload = fetchRaw
         fetchFinalData = [...final, sortedAllWarehouses]
 
@@ -83,6 +91,9 @@ function WarehouseComponent() {
     const [data, setData] = useState<any>(fetchFinalData)
     const [rawData, setRawData] = useState<any>(fetchedRawPayload)
     const [sizeActive, setSizeActive] = useState<any>(1036)
+    const [isOutOfStockHide, setIsOutOfStockHide] = useState<boolean>(true)
+    const [isAllInStock, setIsAllInStock] = useState<boolean>(allInStock)
+    const [isThereNoSize, setIsThereNoSize] = useState<boolean>(noSize)
 
 
     useEffect(() => {
@@ -121,6 +132,7 @@ function WarehouseComponent() {
                 }
 
 
+                setIsAllInStock(  !raw.find((size:any) => size.stocks.length === 0))
                  setData([...final, sortedAllWarehouses])
                  setRawData(raw)
                 setSizeActive(1036)
@@ -164,10 +176,52 @@ function WarehouseComponent() {
 
 
         <div className='mediaQueriesLg text-sm rounded-xl bg-white lg:p-[20px] flex flex-col gap-y-4  mb-[24px] mt-[24px] '>
-            <div className='text-neutral-700 text-xl font-semibold'>Раскладка по складам</div>
+            <div className='flex justify-between items-center max-w-[400px]'><div className='text-neutral-700 text-xl font-semibold'>Раскладка по складам</div>
+
+                { !isAllInStock ? (
+                <button onClick={(prev) => {
+                console.log(isOutOfStockHide);
+                setIsOutOfStockHide(!isOutOfStockHide)
+            } } className='w-8 h-8  text-teal-200 cursor-pointer'>{ isOutOfStockHide ? <EyeIcon/> :<EyeSlashIcon/> }</button>) : null}
+
+            </div>
+
+            { !isThereNoSize ? (
             <div className='flex items-center gap-3  flex-wrap'>
                 <button onClick={allSizesHandler}  className={`rounded-lg button-border-style py-[3px] px-[12px] flex flex-col  ${ sizeActive == 1036 ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span>все</span><span className="text-neutral-400">размеры</span></button>
-                {rawData.map((size: any) =>  <button key={size.name} onClick={() => activeSizeHandler(size.stocks.length, size.name)}  className={`rounded-lg  py-[3px] px-[12px] flex flex-col  ${size.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeActive == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' button-border-style hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks.length === 0 ? "disabled-text-color" :  '' }`}>{size?.origName}</span><span className={`text-xs ${size?.stocks?.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size?.name}</span></button> )}</div>
+                {
+                    rawData.map((size: any) => {
+                        if (size.stocks.length !== 0 || !isOutOfStockHide && size.stocks.length === 0 ) {
+                            return (
+                                <button
+                                    key={size.name}
+                                    onClick={() => activeSizeHandler(size.stocks.length, size.name)}
+                                    className={`rounded-lg py-[3px] px-[12px] flex flex-col ${
+                                        size.stocks?.length === 0
+                                            ? 'cursor-not-allowed bg-neural-400 disabled-button-bg'
+                                            : sizeActive == size.name
+                                                ? 'active-button-size hover:border-teal-500 hover:outline-4 cursor-pointer'
+                                                : 'button-border-style hover:border-teal-500 hover:outline-4 cursor-pointer'
+                                    }`}
+                                >
+          <span className={`${size?.stocks.length === 0 ? 'disabled-text-color' : ''}`}>
+            {size?.origName}
+          </span>
+                                    <span className={`text-xs ${size?.stocks?.length !== 0 ? 'text-neutral-400' : 'disabled-text-color'}`}>
+            {size?.name}
+          </span>
+                                </button>
+                            );
+                        }
+
+                        return null;
+                    })
+                }
+
+            </div>
+            ) : null}
+
+
             {<div className='text-neutral-700 text-lg font-medium'>{fastestWarehouse?.whName}: <span>{fastestWarehouse?.time1 + fastestWarehouse?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
             <div className='border-t-[1px] border-teal-200'></div>
             {allWarehousesArr?.map((item:any) =>  <div key={item.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span className='font-medium'>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div></div>)}
