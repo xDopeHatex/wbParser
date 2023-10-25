@@ -96,6 +96,8 @@ function WarehouseComponent() {
     const [isThereNoSize, setIsThereNoSize] = useState<boolean>(noSize)
 
 
+
+
     useEffect(() => {
         // Listen for every update of URL from BG and update urlForDataFetch and productId
         const messageListener = (message: any) => {
@@ -136,6 +138,7 @@ function WarehouseComponent() {
                 setIsAllInStock(  !raw.find((size:any) => size.stocks.length === 0))
                  setData([...final, sortedAllWarehouses])
                  setRawData(raw)
+
                 setSizeActive(1036)
 
 
@@ -164,12 +167,20 @@ function WarehouseComponent() {
     const allSizesHandler = () => {
             setSizeActive(1036)
     }
+    const rawAllWH = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
+    const allWH = rawAllWH.map((wh:any ) => { return {...wh, timeTotal: wh.time1 + wh.time2}})
+    const theFastestWH = allWH.sort((a:any , b:any) => (a.timeTotal) - (b.timeTotal))[0]
+    console.log(theFastestWH.timeTotal)
 
 
-    if (data && rawData && sizeActive) {
 
-        const allWarehousesArr = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
-        const fastestWarehouse = [...allWarehousesArr].sort((a:any , b:any) => (a.time1 + a.time2) - (b.time1 + b.time1))[0]
+
+    if (allWH && rawData && sizeActive && theFastestWH) {
+
+
+
+
+
 
         return  (
 
@@ -221,9 +232,9 @@ function WarehouseComponent() {
             ) : null}
 
 
-            {<div className='text-neutral-700 text-lg font-medium'>{fastestWarehouse?.whName}: <span>{fastestWarehouse?.time1 + fastestWarehouse?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
+            {<div className='text-neutral-700 text-lg font-medium'>{theFastestWH?.whName}: <span>{theFastestWH?.time1 + theFastestWH?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
             <div className='border-t-[1px] border-teal-200'></div>
-            {allWarehousesArr?.map((item:any) =>  <div key={item.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span className='font-medium'>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div></div>)}
+            {allWH?.map((item:any) =>  <div key={item.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span className='font-medium'>{item?.timeTotal} ч.</span><span>{item?.qty} шт.</span></div></div>)}
         </div>
 
 
