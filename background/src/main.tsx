@@ -79,34 +79,25 @@ function handleBeforeRequest(details: any) {
 
 
 
-                     const maxRetries = 10; // Define the maximum number of retry attempts
+                     const maxRetries = 10;
                      let retryCount = 0;
 
                     async function fetchData(url: any) {
                         try {
-
-
 
                             while (retryCount < maxRetries) {
                                 const responseWH = await fetch(currentUrlWarhouse);
                                 const responseWHJSON = await responseWH.json();
                                 const payloadWarehouse = responseWHJSON;
                                 fetchWarehouseNames.data = payloadWarehouse;
-
-
-
                             const response = await fetch(url);
                                 if (!response.ok) {
                                     throw new Error('Network response was not ok');
                                 }
                             const responseJSON = await response.json();
-
                             const product = responseJSON.data.products.find((item: any) => item.id === productId);
-
-
                             const warehousePayload = product
                                 console.log(warehousePayload, 'THATS GO FOR RAW FROM BG')
-
                                 chrome.tabs.sendMessage(tabs[0].id!, {
                                     type: "COMBINED_PAYLOAD",
                                     data: {
@@ -119,13 +110,11 @@ function handleBeforeRequest(details: any) {
                             console.error(`Fetch error: ${error}`);
                             retryCount++;
                             console.log(`Retrying (attempt ${retryCount})...`);
-                            await new Promise(resolve => setTimeout(resolve, 10)); // Retry after a delay (e.g., 1 second)
+                            await new Promise(resolve => setTimeout(resolve, 10));
                         }
                     }
 
                     fetchData(details.url);
-
-
 
 
                 }

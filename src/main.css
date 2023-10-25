@@ -71,6 +71,10 @@ code {
   box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5)
 }
 
+.fonr-semibold-style {
+  font-weight: 800;
+}
+
 
 
 .box-shadow {

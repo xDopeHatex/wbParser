@@ -12,7 +12,8 @@ type dataType = any
 
 let fetchedRawPayload: any
 let fetchFinalData: any
-let firstSizeActive: any
+
+
 
 
 function handleMessage(message: any) {
@@ -31,18 +32,41 @@ function handleMessage(message: any) {
 
         const fetchRaw = preFetchRaw.sizes.sort((a:any , b:any) => a.name - b.name)
 
+        const allWarehouses: any = []
+        const dataToWork = [...final]
+        dataToWork.forEach((size:any) => size.forEach((wh:any) => allWarehouses.push(wh)))
+        const sortedAllWarehouses: any = [];
 
+        for (let i = 0; i < allWarehouses.length; i++) {
+            const whInWork: any = { ...allWarehouses[i], name : 1036, };
 
+            const existingWarehouseIndex = sortedAllWarehouses.findIndex((wh: any) => wh.wh === whInWork.wh);
 
+            if (existingWarehouseIndex !== -1) {
+
+                sortedAllWarehouses[existingWarehouseIndex].qty += whInWork.qty;
+            } else {
+
+                sortedAllWarehouses.push(whInWork);
+            }
+        }
 
         fetchedRawPayload = fetchRaw
-        fetchFinalData = final
+        fetchFinalData = [...final, sortedAllWarehouses]
 
 
-        firstSizeActive =  final.find((size: any) => size?.length > 0 )[0].name
-        console.log(firstSizeActive, 'yeeee')
-        console.log('raw', fetchedRawPayload)
-        console.log('final', fetchFinalData)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -58,7 +82,7 @@ function WarehouseComponent() {
 
     const [data, setData] = useState<any>(fetchFinalData)
     const [rawData, setRawData] = useState<any>(fetchedRawPayload)
-    const [sizeActive, setSizeActive] = useState<any>(firstSizeActive)
+    const [sizeActive, setSizeActive] = useState<any>(1036)
 
 
     useEffect(() => {
@@ -77,12 +101,33 @@ function WarehouseComponent() {
                 const raw = preRaw.sizes.sort((a:any , b:any) => a.name - b.name)
                 const final = preFinal.map((arr: any) => arr.sort((a:any , b:any) => a.priority - b.priority))
 
+                const allWarehouses: any = []
+                const dataToWork = [...final]
+                dataToWork.forEach((size:any) => size.forEach((wh:any) => allWarehouses.push(wh)))
+                const sortedAllWarehouses: any = [];
 
-                 setData(final)
+                for (let i = 0; i < allWarehouses.length; i++) {
+                    const whInWork: any = { ...allWarehouses[i], name : 1036, };
+
+                    const existingWarehouseIndex = sortedAllWarehouses.findIndex((wh: any) => wh.wh === whInWork.wh);
+
+                    if (existingWarehouseIndex !== -1) {
+
+                        sortedAllWarehouses[existingWarehouseIndex].qty += whInWork.qty;
+                    } else {
+
+                        sortedAllWarehouses.push(whInWork);
+                    }
+                }
+
+
+                 setData([...final, sortedAllWarehouses])
                  setRawData(raw)
-                setSizeActive(final.find((size: any) => size?.stocks?.length !== 0 )[0].name)
+                setSizeActive(1036)
                 console.log(rawData, 'rawState')
                 console.log(data, 'dataState')
+
+
 
 
                 // const fuck = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeData.name )).filter((arr:any) => arr.length !== 0 )
@@ -105,10 +150,14 @@ function WarehouseComponent() {
 
     }
 
+    const allSizesHandler = () => {
+            setSizeActive(1036)
+    }
+
 
     if (data && rawData && sizeActive) {
-        const fastestWarehouse = data.map((sizes: any) => sizes.filter((item: any) => item?.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0][0]
-        const allWarehousesArr = data.map((sizes: any) => sizes.filter((item: any) => item?.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
+        const fastestWarehouse = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0][0]
+        const allWarehousesArr = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
 
 
         return  (
@@ -116,10 +165,12 @@ function WarehouseComponent() {
 
         <div className='mediaQueriesLg text-sm rounded-xl bg-white lg:p-[20px] flex flex-col gap-y-4  mb-[24px] mt-[24px] '>
             <div className='text-neutral-700 text-xl'>Раскладка по складам</div>
-            <div className='flex items-center gap-3  flex-wrap'>{rawData.map((size: any) =>  <button key={size.name} onClick={() => activeSizeHandler(size.stocks.length, size.name)}  className={`rounded-lg button-border-style py-[3px] px-[12px] flex flex-col  ${size.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeActive == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks.length === 0 ? "disabled-text-color" :  '' }`}>{size?.origName}</span><span className={`text-xs ${size?.stocks?.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size?.name}</span></button> )}</div>
+            <div className='flex items-center gap-3  flex-wrap'>
+                <button onClick={allSizesHandler}  className={`rounded-lg button-border-style py-[3px] px-[12px] flex flex-col  ${ sizeActive == 1036 ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span>все</span><span className="text-neutral-400">размеры</span></button>
+                {rawData.map((size: any) =>  <button key={size.name} onClick={() => activeSizeHandler(size.stocks.length, size.name)}  className={`rounded-lg  py-[3px] px-[12px] flex flex-col  ${size.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeActive == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' button-border-style hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks.length === 0 ? "disabled-text-color" :  '' }`}>{size?.origName}</span><span className={`text-xs ${size?.stocks?.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size?.name}</span></button> )}</div>
             {<div className='text-neutral-700 text-lg'>{fastestWarehouse?.whName}: <span>{fastestWarehouse?.time1 + fastestWarehouse?.time2} час.</span> <span className='inline-block h-5 w-5 text-teal-200'><BoltIcon/></span></div> }
             <div className='border-t-[1px] border-teal-200'></div>
-            {allWarehousesArr?.map((item:any) =>  <div key={item?.wh} className='flex items-center'><span className='flex-1'>{item?.whName}</span><span>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div>)}
+            {allWarehousesArr?.map((item:any) =>  <div key={item?.wh} className='flex max-w-[400px] items-center'><span className='flex-1'>{item?.whName}</span><div  className='w-[40%] flex justify-between'><span>{item?.time1 + item?.time2} ч.</span><span>{item?.qty} шт.</span></div></div>)}
         </div>
 
 
