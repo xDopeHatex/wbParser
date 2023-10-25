@@ -59,6 +59,20 @@ code {
   }
 }
 
+.button-border-style  {
+
+
+  box-shadow: 0 0 0 1px rgba(209, 212, 221, 1)
+}
+
+.button-border-style:hover  {
+
+
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5)
+}
+
+
+
 .box-shadow {
   box-shadow: 0 0 20px rgba(0,0,0,.1)
 }
