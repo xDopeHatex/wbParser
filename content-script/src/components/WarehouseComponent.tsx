@@ -55,7 +55,8 @@ function handleMessage(message: any) {
 
         allInStock = !fetchRaw.find((size:any) => size.stocks.length === 0)
 
-        noSize = !!fetchRaw.find((size:any) => size.name === '')
+
+        noSize = !!fetchRaw.find((size:any) => size.name === '') ||  fetchRaw.filter((size:any) => size.stocks.length !== 0).length === 1
 
 
 
@@ -134,7 +135,7 @@ function WarehouseComponent() {
                 }
 
 
-                setIsThereNoSize(!!raw.find((size:any) => size.name === ''))
+                setIsThereNoSize(!!raw.find((size:any) => size.name === '') ||  raw.filter((size:any) => size.stocks.length !== 0).length === 1)
                 setIsAllInStock(  !raw.find((size:any) => size.stocks.length === 0))
                  setData([...final, sortedAllWarehouses])
                  setRawData(raw)
@@ -201,7 +202,7 @@ function WarehouseComponent() {
                 <button onClick={allSizesHandler}  className={`rounded-lg button-border-style py-[3px] px-[12px] flex flex-col  ${ sizeActive == 1036 ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span>все</span><span className="text-neutral-400">размеры</span></button>
                 {
                     rawData.map((size: any) => {
-                        if (size.stocks.length !== 0 || !isOutOfStockHide && size.stocks.length === 0 ) {
+                        if (size.stocks.length !== 0  || !isOutOfStockHide && size.stocks.length === 0 ) {
                             return (
                                 <button
                                     key={size.name}
