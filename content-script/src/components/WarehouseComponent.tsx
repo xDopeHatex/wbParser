@@ -12,7 +12,7 @@ type dataType = any
 
 let fetchedRawPayload: any
 let fetchFinalData: any
-let firstSizeData: any
+let firstSizeActive: any
 
 
 function handleMessage(message: any) {
@@ -38,10 +38,10 @@ function handleMessage(message: any) {
         fetchedRawPayload = fetchRaw
         fetchFinalData = final
 
-        firstSizeData =  final.find((size: any) => size?.stocks?.length !== 0 )[0]
+        firstSizeActive =  final.find((size: any) => size?.stocks?.length !== 0 )[0].name
         console.log('raw', fetchedRawPayload)
         console.log('final', fetchFinalData)
-        console.log('firstSize', firstSizeData)
+
 
 
 
@@ -56,7 +56,7 @@ function WarehouseComponent() {
 
     const [data, setData] = useState<any>(fetchFinalData)
     const [rawData, setRawData] = useState<any>(fetchedRawPayload)
-    const [sizeData, setSizeData] = useState<any>(firstSizeData)
+    const [sizeActive, setSizeActive] = useState<any>(firstSizeActive)
 
 
     useEffect(() => {
@@ -78,13 +78,13 @@ function WarehouseComponent() {
 
                  setData(final)
                  setRawData(raw)
-                setSizeData(final.find((size: any) => size?.stocks?.length !== 0 )[0])
+                setSizeActive(final.find((size: any) => size?.stocks?.length !== 0 )[0].name)
                 console.log(rawData, 'rawState')
                 console.log(data, 'dataState')
 
 
-                const fuck = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeData.name )).filter((arr:any) => arr.length !== 0 )
-                console.log(fuck, 'kkkdf')
+                // const fuck = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeData.name )).filter((arr:any) => arr.length !== 0 )
+                // console.log(fuck, 'kkkdf')
 
             }
 
@@ -94,16 +94,20 @@ function WarehouseComponent() {
         return () => chrome.runtime.onMessage.removeListener(messageListener)
     }, []);
 
+    const activeSizeHandler = (size: any) => {
+       setSizeActive(size)
+    }
 
-    if (data && rawData && sizeData) { return  (
+
+    if (data && rawData && sizeActive) { return  (
 
 
         <div className='mediaQueriesLg text-sm rounded-xl bg-white lg:p-[20px] flex flex-col gap-y-4  mb-[24px] mt-[24px] '>
             <div className='text-neutral-700 text-xl'>Раскладка по складам</div>
-            <div className='flex items-center gap-3  flex-wrap'>{rawData?.map((size: any) =>  <div key={size.name} className={`rounded-lg border-[1px] py-[3px] px-[12px] flex flex-col  ${size?.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeData.name == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks?.length === 0 ? "disabled-text-color" :  '' }`}>{size.origName}</span><span className={`text-xs ${size.stocks.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size.name}</span></div> )}</div>
-            {data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeData.name )).filter((arr:any) => arr.length !== 0 )[0].map((item:any) => <div className='text-neutral-700 text-lg'>{item.whName}: <span>{item.time1 + item.time2} час.</span> <span className='inline-block h-5 w-5'><BoltIcon/></span></div> )}
+            <div className='flex items-center gap-3  flex-wrap'>{rawData?.map((size: any) =>  <div key={size.name} onClick={() => activeSizeHandler(size.name)} className={`rounded-lg border-[1px] py-[3px] px-[12px] flex flex-col  ${size?.stocks?.length === 0 ? ' cursor-not-allowed  bg-neural-400 disabled-button-bg' :    sizeActive == size.name ? "active-button-size  hover:border-teal-500 hover:outline-4 cursor-pointer" :  ' hover:border-teal-500 hover:outline-4 cursor-pointer'  }`} ><span className={`${size?.stocks?.length === 0 ? "disabled-text-color" :  '' }`}>{size.origName}</span><span className={`text-xs ${size.stocks.length !== 0 ? "text-neutral-400" : 'disabled-text-color'}`}>{size.name}</span></div> )}</div>
+            {data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0].map((item:any, index: number) => index === 1 ?  (<div className='text-neutral-700 text-lg'>{item.whName}: <span>{item.time1 + item.time2} час.</span> <span className='inline-block h-5 w-5'><BoltIcon/></span></div> ) : null)}
             <div className='border-t-[1px] border-teal-500'></div>
-            {data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeData.name )).filter((arr:any) => arr.length !== 0 )[0].map((item:any, index: number) => index >= 1 ?  (<div key={item.wh} className='flex items-center'><span className='flex-1'>{item.whName}</span><span>{item.time1 + item.time2} ч.</span><span>{item.qty} шт.</span></div>) : null)}
+            {data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0].map((item:any, index: number) => index >= 1 ?  (<div key={item.wh} className='flex items-center'><span className='flex-1'>{item.whName}</span><span>{item.time1 + item.time2} ч.</span><span>{item.qty} шт.</span></div>) : null)}
 
         </div>
 
