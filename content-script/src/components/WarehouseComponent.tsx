@@ -54,10 +54,10 @@ function handleMessage(message: any) {
         }
 
         allInStock = !fetchRaw.find((size:any) => size.stocks.length === 0)
-        console.log(allInStock, 'sdsd')
+
         noSize = !!fetchRaw.find((size:any) => size.name === '')
 
-        console.log(noSize,'siz')
+
 
         fetchedRawPayload = fetchRaw
         fetchFinalData = [...final, sortedAllWarehouses]
@@ -137,8 +137,7 @@ function WarehouseComponent() {
                  setData([...final, sortedAllWarehouses])
                  setRawData(raw)
                 setSizeActive(1036)
-                console.log(rawData, 'rawState')
-                console.log(data, 'dataState')
+
 
 
 
@@ -168,9 +167,9 @@ function WarehouseComponent() {
 
 
     if (data && rawData && sizeActive) {
-        const fastestWarehouse = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0][0]
-        const allWarehousesArr = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
 
+        const allWarehousesArr = data.map((sizes: any) => sizes.filter((item: any) => item.name == sizeActive )).filter((arr:any) => arr.length !== 0 )[0]
+        const fastestWarehouse = [...allWarehousesArr].sort((a:any , b:any) => (a.time1 + a.time2) - (b.time1 + b.time1))[0]
 
         return  (
 
@@ -180,7 +179,7 @@ function WarehouseComponent() {
 
                 { !isAllInStock ? (
                 <button onClick={(prev) => {
-                console.log(isOutOfStockHide);
+
                 setIsOutOfStockHide(!isOutOfStockHide)
             } } className='w-8 h-8  text-teal-200 cursor-pointer'>{ isOutOfStockHide ? <EyeIcon/> :<EyeSlashIcon/> }</button>) : null}
 
