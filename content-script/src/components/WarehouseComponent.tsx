@@ -66,6 +66,20 @@ function handleMessage(message: any) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         chrome.runtime.onMessage.removeListener(handleMessage);
 
     }
@@ -83,7 +97,7 @@ function WarehouseComponent() {
 
 
     useEffect(() => {
-
+        // Listen for every update of URL from BG and update urlForDataFetch and productId
         const messageListener = (message: any) => {
 
             if (message.type === "COMBINED_PAYLOAD") {
@@ -117,8 +131,8 @@ function WarehouseComponent() {
                     }
                 }
 
-                setIsThereNoSize(!!raw.find((size:any) => size.name === ''))
 
+                setIsThereNoSize(!!raw.find((size:any) => size.name === ''))
                 setIsAllInStock(  !raw.find((size:any) => size.stocks.length === 0))
                  setData([...final, sortedAllWarehouses])
                  setRawData(raw)
