@@ -9,16 +9,17 @@
   },
   "icons": {},
 
-  "permissions": ["storage", "tabs", "activeTab", "scripting", "declarativeNetRequest", "activeTab", "webRequest", "webNavigation"],
+  "permissions": ["alarms","storage", "tabs", "activeTab", "scripting", "declarativeNetRequest", "activeTab", "webRequest", "webNavigation"],
   "host_permissions": ["https://*/"],
   "background": {
-    "service_worker": "background/src/main.tsx"
+    "service_worker": "background/src/main.tsx",
+    "type": "module"
 
   },
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://www.wildberries.ru/*"],
       "js": ["content-script/src/main.tsx"],
       "media": []
     }

@@ -1,107 +1,154 @@
-
-
-// @ts-ignore
-const urlProductsStartPattern = 'https://card.wb.ru/cards/v1/detail'
+const urlProductsStartPattern = 'https://card.wb.ru/cards/v1/detail?appType'
 const urlWarehouseEndsWith = 'stores-data.json'
 const prev = 'https://www.wildberries.ru/webapi/product/'
+const regexTabUrl = /\/(\d+)\/detail.aspx/;
+
+
+type readyForFetchType = {
+    fetchProducts : null | string
+    fetchWarehouse : null | string
+}
 
 let prevUrlProducts: string
 let prevUrlWarehouse: string
+let currentUrlWarhouse: string
 
-let pageReloaded: boolean = false
+let pageReloadedProducts: boolean = false
+let pageReloadedWarehouse: boolean = false
+let pageChangedUrlProducts: boolean = false
+let pageChangedUrlWarehouse: boolean = false
+
+const readyForFetch: readyForFetchType = {
+    fetchProducts : null,
+    fetchWarehouse : null
+}
+
+chrome.alarms.onAlarm.addListener(a => {
+    console.log('Alarm! Alarm!', a);
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.alarms.get('alarm', a => {
+        if (!a) {
+            console.log('ALARM')
+            chrome.alarms.create('alarm', {periodInMinutes: 0.1});
+        }
+    });
+});
 
 
 
 
 chrome.webNavigation.onCommitted.addListener((details) => {
     if (details?.transitionType === "reload") {
-       pageReloaded = true
 
+        pageReloadedProducts = true
+        pageReloadedWarehouse = true
     }
 });
 
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+    pageChangedUrlProducts = true
+    pageChangedUrlWarehouse = true
+});
+
+const fetchWarehouseNames: any = {}
+
+
+function handleBeforeRequest(details: any) {
 
 
 
-chrome.webRequest.onCompleted.addListener(
-    function(details) {
-        if (details.method === "GET" && details.url.startsWith(urlProductsStartPattern)) {
-            // You can customize the conditions for capturing responses as needed
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
 
-            const url = details.url
+            if (details.url.startsWith(urlProductsStartPattern)) {
 
-            // Send the response information to the content script
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (pageChangedUrlProducts || pageReloadedProducts) {
+
+                    if (pageReloadedProducts) {
+                        pageReloadedProducts = false
+                    }
+
+                    if (pageChangedUrlProducts) {
+                        pageChangedUrlProducts = false
+                    }
 
 
-                if ( tabs[0].url !== prevUrlProducts || pageReloaded) {
+                    const productIdRaw = tabs[0]?.url?.match(regexTabUrl)![1] as string;
+                    const productId = parseInt(productIdRaw, 10);
 
-                    pageReloaded = false
-                    prevUrlProducts = tabs[0].url!
-                    chrome.tabs.sendMessage(tabs[0].id!, {type: "URL_PRODUCTS", data: {url, tabUrl: tabs[0].url}});
+
+
+                     const maxRetries = 10;
+                     let retryCount = 0;
+
+                    async function fetchData(url: any) {
+                        try {
+
+                            while (retryCount < maxRetries) {
+                                const responseWH = await fetch(currentUrlWarhouse);
+                                const responseWHJSON = await responseWH.json();
+                                const payloadWarehouse = responseWHJSON;
+                                fetchWarehouseNames.data = payloadWarehouse;
+                            const response = await fetch(url);
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                            const responseJSON = await response.json();
+                            const product = responseJSON.data.products.find((item: any) => item.id === productId);
+                            const warehousePayload = product
+                                console.log(warehousePayload, 'THATS GO FOR RAW FROM BG')
+                                chrome.tabs.sendMessage(tabs[0].id!, {
+                                    type: "COMBINED_PAYLOAD",
+                                    data: {
+                                        productsPayload: { payload: product.extended },
+                                        warehousePayload: { payload: warehousePayload, names: fetchWarehouseNames.data },
+                                    }
+                                });
+                            return response.ok
+                        }} catch (error) {
+                            console.error(`Fetch error: ${error}`);
+                            retryCount++;
+                            console.log(`Retrying (attempt ${retryCount})...`);
+                            await new Promise(resolve => setTimeout(resolve, 10));
+                        }
+                    }
+
+                    fetchData(details.url);
+
 
                 }
-            });
-        }
+            }
 
-        if (details.method === "GET" && details.url.endsWith(urlWarehouseEndsWith)) {
-            // You can customize the conditions for capturing responses as needed
+        if (details.url.endsWith(urlWarehouseEndsWith)) {
+            if ( details.url !== prevUrlProducts ) {
+                currentUrlWarhouse = details.url
 
-            const url = details.url
-
-            // Send the response information to the content script
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            }
 
 
-                if ( tabs[0].url !== prevUrlWarehouse || pageReloaded) {
 
-                    pageReloaded = false
-                    prevUrlWarehouse = tabs[0].url!
-                    chrome.tabs.sendMessage(tabs[0].id!, {type: "URL_WAREHOUSE", data: {url, tabUrl: tabs[0].url}});
-
-                }
-            });
         }
 
 
-    },
-    { urls: ["<all_urls>"] },
-    ["responseHeaders"]
+
+
+        }
+
+
+
+    )}
+
+
+
+
+
+
+// Add an event listener for onBeforeRequest
+chrome.webRequest.onBeforeRequest.addListener(
+    handleBeforeRequest,
+    { urls: ['https://card.wb.ru/cards/v1/detail?appType*', '*://*/*/stores-data.json*'] }
 );
 
 
 
-
-
-
-
-
-//
-//
-// chrome?.runtime?.onInstalled.addListener(function() {
-//
-//     chrome?.webRequest?.onBeforeRequest.addListener(
-//         function(details) {
-//
-//
-//
-//
-//             if ( (details.method === "GET" && regexUrlPattern2.test(details.url))) {
-//
-//                 const message = {
-//                     type: "GET_REQUEST",
-//                     url: details.url
-//                 };
-//
-//                 // Send the message to the content script
-//                 chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-//                     chrome.tabs.sendMessage(tabs[0].id, message);
-//                 });
-//             }
-//         },
-//         { urls: ["<all_urls>"] },
-//         ["requestBody"]
-//     );
-// });
-//
-//

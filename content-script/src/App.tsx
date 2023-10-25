@@ -16,7 +16,7 @@ useEffect(() => {
     <div >
       <header className="text-3xl text-red-500">
 
-        <p>ТЫ ПИДОР</p>
+
 
       </header>
     </div>

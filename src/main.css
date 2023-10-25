@@ -3,62 +3,52 @@
 @tailwind utilities;
 
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
 
 
-.App {
-  width: 23rem;
-  text-align: center;
+
+
+
+.button-border-style  {
+
+
+  box-shadow: 0 0 0 1px rgba(209, 212, 221, 1)
 }
 
-.App-logo {
-  width: unset;
-  height: 40vmin;
-  pointer-events: none;
+.button-border-style:hover  {
+
+
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5)
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.fonr-semibold-style {
+  font-weight: 800;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 .box-shadow {
   box-shadow: 0 0 20px rgba(0,0,0,.1)
+}
+
+.disabled-button-bg {
+  background-color: #F6F6F9;
+  color: #D5D6DF;
+  border-color: #F6F6F9;
+}
+
+.disabled-text-color {
+  color: #D5D6DF;
+}
+
+.active-button-size {
+  background-color: #ccfbf1;
+  box-shadow: 0 0 20px rgba(0,0,0,.1);
+  border-color: #ccfbf1;
+}
+
+@media (min-width: 1024px) {
+  .mediaQueriesLg {
+    box-shadow: 0 0 20px rgba(0, 0, 0, .1)
+  }
+
 }
